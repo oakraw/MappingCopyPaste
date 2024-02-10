@@ -10,7 +10,11 @@ import com.intellij.util.xmlb.XmlSerializerUtil
 class PluginSettings : PersistentStateComponent<PluginSettings> {
     var mappings: String = """
         {
-            "original_text": "converted_text"
+            "original_text": "converted_text",
+            "selectable_option_text": [
+                "option1",
+                "option2"
+            ]
         }
     """.trimIndent() // Default to empty JSON object
 

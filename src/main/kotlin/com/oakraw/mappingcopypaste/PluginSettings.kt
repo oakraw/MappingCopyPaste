@@ -16,7 +16,7 @@ class PluginSettings : PersistentStateComponent<PluginSettings> {
                 "option2"
             ]
         }
-    """.trimIndent() // Default to empty JSON object
+    """.trimIndent()
 
     override fun getState(): PluginSettings = this
 

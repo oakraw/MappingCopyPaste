@@ -10,6 +10,7 @@ import kotlinx.serialization.json.*
 import java.awt.datatransfer.DataFlavor
 import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.openapi.ui.popup.ListPopup
+import java.util.*
 
 class MappingCopyPasteAction : AnAction() {
     override fun actionPerformed(e: AnActionEvent) {
@@ -53,10 +54,7 @@ class MappingCopyPasteAction : AnAction() {
     }
 
     private fun applyMappings(e: AnActionEvent, text: String, mappings: Map<String, Any>, onSuccess: (String) -> Unit) {
-        var modifiedText = text
-        val converted = mappings[text]
-
-        when (converted) {
+        when (val converted = mappings.getCaseInsensitive(text)) {
             is String -> {
                 onSuccess.invoke(converted)
             }
@@ -69,7 +67,7 @@ class MappingCopyPasteAction : AnAction() {
             }
 
             else -> {
-                onSuccess.invoke(modifiedText)
+                onSuccess.invoke(text)
             }
         }
     }
@@ -87,15 +85,17 @@ class MappingCopyPasteAction : AnAction() {
     private fun showDropdown(e: AnActionEvent, text: String, actions: List<AnAction>) {
         val popupFactory = JBPopupFactory.getInstance()
         val listPopup: ListPopup = popupFactory.createActionGroupPopup(
-                text, // Title
-                DefaultActionGroup(actions), // Actions to display
-                e.dataContext, // Context
-                JBPopupFactory.ActionSelectionAid.SPEEDSEARCH, // Enable speed search
-                true // Show numbers for mnemonic navigation
+                text,
+                DefaultActionGroup(actions),
+                e.dataContext,
+                JBPopupFactory.ActionSelectionAid.SPEEDSEARCH,
+                true
         )
 
-        // Show the popup. For example, in the center of the current window.
-//        listPopup.showCenteredInCurrentWindow(e.project!!)
         listPopup.showInBestPositionFor(e.dataContext)
+    }
+
+    private fun <V> Map<String, V>.getCaseInsensitive(key: String): V? {
+        return this.entries.firstOrNull { it.key.equals(key, ignoreCase = true) }?.value
     }
 }

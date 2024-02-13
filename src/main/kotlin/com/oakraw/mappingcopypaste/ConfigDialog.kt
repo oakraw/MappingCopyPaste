@@ -3,6 +3,7 @@ package com.oakraw.mappingcopypaste
 import com.intellij.openapi.ui.DialogWrapper
 import javax.swing.JComponent
 import javax.swing.JPanel
+import com.intellij.ui.components.JBScrollPane
 import javax.swing.JTextArea
 
 class ConfigDialog : DialogWrapper(true) {
@@ -16,7 +17,10 @@ class ConfigDialog : DialogWrapper(true) {
     override fun createCenterPanel(): JComponent {
         val panel = JPanel()
         textArea.text = PluginSettings.getInstance().mappings
-        panel.add(textArea)
+
+        val scrollPane = JBScrollPane(textArea)
+        panel.add(scrollPane)
+
         return panel
     }
 

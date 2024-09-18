@@ -1,47 +1,64 @@
 plugins {
-    id("java")
-    id("org.jetbrains.kotlin.jvm") version "1.9.20"
-    id("org.jetbrains.intellij") version "1.15.0"
+    id("java") // Java support
+    alias(libs.plugins.kotlin) // Kotlin support
+    alias(libs.plugins.intelliJPlatform) // IntelliJ Platform Gradle Plugin
 }
 
-group = "com.oakraw"
-version = "1.1.3"
+val pluginGroup = "com.oakraw"
+val pluginVersion = "1.1.4"
+
+group = pluginGroup
+version = pluginVersion
+
+// Set the JVM language level used to build the project.
+kotlin {
+    jvmToolchain(17)
+}
+
 
 repositories {
     mavenCentral()
+    intellijPlatform {
+        defaultRepositories()
+    }
 }
 
-// Configure Gradle IntelliJ Plugin
-// Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
-intellij {
-    version.set("2022.2.5")
-    type.set("IC") // Target IDE Platform
+dependencies {
+    val platformType = "IC"
+    val platformVersion = "2023.3"
 
-    plugins.set(listOf(/* Plugin Dependencies */))
-    updateSinceUntilBuild.set(false)
+    intellijPlatform {
+        create(platformType, platformVersion)
+        instrumentationTools()
+    }
+}
+
+intellijPlatform {
+    pluginConfiguration {
+        name = "MappingCopyPaste"
+        version = pluginVersion
+
+        ideaVersion {
+            sinceBuild = "233"
+            untilBuild = "242.*"
+        }
+    }
+
+    signing {
+        certificateChain = providers.environmentVariable("CERTIFICATE_CHAIN")
+        privateKey = providers.environmentVariable("PRIVATE_KEY")
+        password = providers.environmentVariable("SIGN_PASSWORD")
+    }
+
+    pluginVerification {
+        ides {
+            recommended()
+        }
+    }
 }
 
 tasks {
-    // Set the JVM compatibility versions
-    withType<JavaCompile> {
-        sourceCompatibility = "17"
-        targetCompatibility = "17"
-    }
-    withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-        kotlinOptions.jvmTarget = "17"
-    }
-
-    patchPluginXml {
-        sinceBuild.set("222")
-    }
-
-    signPlugin {
-        certificateChainFile.set(file("chain.crt"))
-        privateKeyFile.set(file("private.pem"))
-        password.set(System.getenv("SIGN_PASSWORD"))
-    }
-
-    publishPlugin {
-        token.set(System.getenv("PUBLISH_TOKEN"))
+    wrapper {
+        gradleVersion = providers.gradleProperty("8.9").get()
     }
 }

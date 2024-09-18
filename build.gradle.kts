@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.oakraw"
-version = "1.1.1"
+version = "1.1.3"
 
 repositories {
     mavenCentral()
@@ -18,6 +18,7 @@ intellij {
     type.set("IC") // Target IDE Platform
 
     plugins.set(listOf(/* Plugin Dependencies */))
+    updateSinceUntilBuild.set(false)
 }
 
 tasks {
@@ -32,7 +33,6 @@ tasks {
 
     patchPluginXml {
         sinceBuild.set("222")
-        untilBuild.set("232.*")
     }
 
     signPlugin {
